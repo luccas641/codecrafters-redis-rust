@@ -8,7 +8,7 @@ async fn handle_connection(mut socket: TcpStream)-> Result<(), Error> {
 
     // In a loop, read data from the socket and write the data back.
     loop {
-        let n = match socket.read(&mut buf).await {
+        match socket.read(&mut buf).await {
             // socket closed
             Ok(n) if n == 0 => break,
             Ok(n) => socket.write_all(b"+PONG\r\n").await?,
@@ -33,11 +33,11 @@ async fn main() -> Result<(), Error>{
     loop {
         let stream = listener.accept().await;
         match stream {
-            Ok((mut _stream, addr)) => {
+            Ok((mut _stream, _)) => {
                 println!("accepted new connection");
                 tokio::spawn(async move {
                     match handle_connection(_stream).await {
-                        Ok(_) => println!("message sent"),
+                        Ok(_) => println!("Connection closed"),
                         Err(_) => println!("error "),
                     }
                 });
@@ -47,5 +47,4 @@ async fn main() -> Result<(), Error>{
             }
         }
     }
-    Ok(())
 }
